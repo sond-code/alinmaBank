@@ -1,0 +1,630 @@
+
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <title>Alinma Chat</title>
+
+  <script src=https://cdn.tailwindcss.com></script>
+
+  <link href=https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap rel="stylesheet">
+
+  <style>
+
+    body {
+
+      font-family: 'Cairo', sans-serif;
+
+      background-color: #f9f9f9;
+
+    }
+
+ 
+
+    .fade-in {
+
+      animation: fadeIn 0.5s ease-out forwards;
+
+      opacity: 0;
+
+    }
+
+ 
+
+    @keyframes fadeIn {
+
+      from {
+
+        opacity: 0;
+
+        transform: translateY(10px);
+
+      }
+
+      to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+      }
+
+    }
+
+ 
+
+    .typing-indicator {
+
+      display: inline-block;
+
+    }
+
+    .typing-indicator span {
+
+      display: inline-block;
+
+      width: 8px;
+
+      height: 8px;
+
+      background-color: #666;
+
+      border-radius: 50%;
+
+      margin: 0 2px;
+
+      animation: bounce 1.4s infinite ease-in-out;
+
+    }
+
+    .typing-indicator span:nth-child(2) {
+
+      animation-delay: 0.2s;
+
+    }
+
+    .typing-indicator span:nth-child(3) {
+
+      animation-delay: 0.4s;
+
+    }
+
+    @keyframes bounce {
+
+      0%, 80%, 100% { transform: translateY(0); }
+
+      40% { transform: translateY(-8px); }
+
+    }
+
+ 
+
+    .btn-click {
+
+      animation: clickEffect 0.3s ease-out;
+
+    }
+
+    @keyframes clickEffect {
+
+      0% { transform: scale(1); }
+
+      50% { transform: scale(0.95); }
+
+      100% { transform: scale(1); }
+
+    }
+
+ 
+
+    .user {
+
+      background-color: #5C4033;
+
+      color: white;
+
+      align-self: flex-end;
+
+      position: relative;
+
+      padding: 10px 16px;
+
+      margin: 8px 0;
+
+      max-width: 70%;
+
+      border-radius: 12px;
+
+      border-bottom-right-radius: 4px;
+
+      animation: userBubbleAppear 0.5s ease-out forwards;
+
+    }
+
+ 
+
+    @keyframes userBubbleAppear {
+
+      from {
+
+        opacity: 0;
+
+        transform: translateX(20px) translateY(10px);
+
+      }
+
+      to {
+
+        opacity: 1;
+
+        transform: translateX(0) translateY(0);
+
+      }
+
+    }
+
+ 
+
+    .user::after {
+
+      content: "";
+
+      position: absolute;
+
+      right: -10px;
+
+      bottom: 10px;
+
+      width: 0;
+
+      height: 0;
+
+      border: 10px solid transparent;
+
+      border-left-color: #5C4033;
+
+      border-right: 0;
+
+      border-bottom: 0;
+
+      margin-top: -5px;
+
+    }
+
+ 
+
+    .bot {
+
+      background-color: #dcdcdc;
+
+      color: black;
+
+      align-self: flex-start;
+
+      position: relative;
+
+      padding: 10px 16px;
+
+      margin: 8px 0;
+
+      max-width: 70%;
+
+      border-radius: 12px;
+
+      border-bottom-left-radius: 4px;
+
+      animation: botBubbleAppear 0.5s ease-out forwards;
+
+    }
+
+ 
+
+    @keyframes botBubbleAppear {
+
+      from {
+
+        opacity: 0;
+
+        transform: translateX(-20px) translateY(10px);
+
+      }
+
+      to {
+
+        opacity: 1;
+
+        transform: translateX(0) translateY(0);
+
+      }
+
+    }
+
+ 
+
+    .bot::after {
+
+      content: "";
+
+      position: absolute;
+
+      left: -10px;
+
+      bottom: 10px;
+
+      width: 0;
+
+      height: 0;
+
+      border: 10px solid transparent;
+
+      border-right-color: #dcdcdc;
+
+      border-left: 0;
+
+      border-bottom: 0;
+
+      margin-top: -5px;
+
+    }
+
+ 
+
+    .chat-container {
+
+      animation: containerAppear 0.8s ease-out;
+
+    }
+
+    @keyframes containerAppear {
+
+      from {
+
+        opacity: 0;
+
+        transform: translateY(20px);
+
+      }
+
+      to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+      }
+
+    }
+
+ 
+
+    .smooth-scroll {
+
+      scroll-behavior: smooth;
+
+    }
+
+  </style>
+
+</head>
+
+<body class="min-h-screen flex items-center justify-center px-4">
+
+  <div style="width: 600px; height: 770px;" class="bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden chat-container">
+
+ 
+
+    <!-- Header -->
+
+    <div class="relative bg-[#E6E6E6] w-full pt-6 pb-6 px-8">
+
+     
+
+      <div class="flex justify-between items-center">
+
+        <div>
+
+          <h1 class="text-2xl font-bold text-[#5C4033]">Relationship Management Assistant</h1>
+
+          <p class="text-sm text-[#5C4033] mt-1">
+
+              Welcome <span class="font-semibold">{{ name }}</span>
+
+            </p>
+
+          <!-- Balance under Welcome -->
+
+          <div class="text-[#5C4033] text-base font-semibold mt-1">
+
+            Balance: {{ balance }} SAR
+
+          </div>
+
+        </div>
+
+        <img src="{{ url_for('static', filename='Alinma_Bank_logo.svg.png') }}"
+
+             alt="Logo"
+
+             class="w-[140px] h-auto object-contain" />
+
+      </div>
+
+ 
+
+      <!-- Logout link in top-right corner -->
+
+      <a href="{{ url_for('logout') }}"
+
+         class="fixed top-4 right-6 z-50 bg-[#5C4033] text-white font-bold px-5 py-2 rounded-xl shadow hover:opacity-90 transition">
+
+         Logout
+
+      </a>
+
+    </div>
+
+ 
+
+   
+
+    <!-- Chat Display -->
+
+    <div id="chatDisplay" class="flex-1 overflow-y-auto px-6 py-4 space-y-4 flex flex-col smooth-scroll"></div>
+
+ 
+
+    <!-- Input -->
+
+    <div class="flex items-center px-4 py-3 bg-white gap-2">
+
+      <input id="userInput" type="text" placeholder="Type your message..."
+
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5C4033] text-gray-800" />
+
+      <button onclick="sendMessage()"
+
+        class="px-5 py-2 bg-[#5C4033] hover:bg-[#3f2e25] text-white font-semibold rounded-lg transition">
+
+        Send
+
+      </button>
+
+    </div>
+
+  </div>
+
+ 
+
+  <script>
+
+    function detectDirection(text) {
+
+      const hasArabic = /[\u0600-\u06FF]/.test(text);
+
+      return hasArabic ? "rtl" : "ltr";
+
+    }
+
+ 
+
+    function capitalizeFirstWord(text) {
+
+      const words = text.trim().split(" ");
+
+      if (words.length === 0) return text;
+
+      words[0] = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+
+      return words.join(" ");
+
+    }
+
+ 
+
+    async function sendMessage() {
+
+      const input = document.getElementById('userInput');
+
+      const display = document.getElementById('chatDisplay');
+
+      const userText = input.value.trim();
+
+ 
+
+      if (userText !== "") {
+
+        input.value = "";
+
+        const sendButton = document.querySelector('button[onclick="sendMessage()"]');
+
+        sendButton.classList.add('btn-click');
+
+        setTimeout(() => sendButton.classList.remove('btn-click'), 300);
+
+ 
+
+        const userMessage = document.createElement('div');
+
+        userMessage.className = 'user fade-in';
+
+        userMessage.dir = detectDirection(userText);
+
+        userMessage.textContent = capitalizeFirstWord(userText);
+
+        display.appendChild(userMessage);
+
+        display.scrollTop = display.scrollHeight;
+
+ 
+
+        const typingIndicator = document.createElement('div');
+
+        typingIndicator.className = 'bot fade-in';
+
+        typingIndicator.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+
+        display.appendChild(typingIndicator);
+
+        display.scrollTop = display.scrollHeight;
+
+ 
+
+        try {
+
+          const response = await fetch('/ask2', {
+
+            method: 'POST',
+
+            headers: { 'Content-Type': 'application/json' },
+
+            body: JSON.stringify({ query: userText })
+
+          });
+
+ 
+
+          display.removeChild(typingIndicator);
+
+          const reader = response.body.getReader();
+
+          const decoder = new TextDecoder("utf-8");
+
+ 
+
+          let buffer = "", finalText = "";
+
+          const botMessage = document.createElement('div');
+
+          botMessage.className = 'bot fade-in';
+
+          display.appendChild(botMessage);
+
+ 
+
+          const flushBuffer = () => {
+
+            if (buffer) {
+
+              finalText += buffer;
+
+              botMessage.textContent = capitalizeFirstWord(finalText);
+
+              botMessage.dir = detectDirection(finalText);
+
+              buffer = "";
+
+              display.scrollTop = display.scrollHeight;
+
+            }
+
+          };
+
+ 
+
+          const interval = setInterval(flushBuffer, 100);
+
+ 
+
+          while (true) {
+
+            const { done, value } = await reader.read();
+
+            if (done) break;
+
+            buffer += decoder.decode(value);
+
+          }
+
+ 
+
+          clearInterval(interval);
+
+          flushBuffer();
+
+ 
+
+        } catch (error) {
+
+          if (typingIndicator.parentNode) {
+
+            display.removeChild(typingIndicator);
+
+          }
+
+ 
+
+          const botMessage = document.createElement('div');
+
+          botMessage.className = 'bot fade-in';
+
+          botMessage.textContent = "I don't have enough information in the document provided.";
+
+          display.appendChild(botMessage);
+
+          console.error("Fetch error:", error);
+
+        }
+
+ 
+
+        display.scrollTop = display.scrollHeight;
+
+      }
+
+    }
+
+ 
+
+    document.getElementById("userInput").addEventListener("keydown", function (event) {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        sendMessage();
+
+      }
+
+    });
+
+ 
+
+   document.addEventListener('DOMContentLoaded', function () {
+
+      const chatContainer = document.querySelector('div[style="width: 700px; height: 770px;"]');
+
+      chatContainer.classList.add('chat-container');
+
+ 
+
+      // Add welcome message
+
+      setTimeout(function () {
+
+        const display = document.getElementById('chatDisplay');
+
+        const welcomeMessage = document.createElement('div');
+
+        welcomeMessage.className = 'bot fade-in';
+
+        welcomeMessage.textContent = "? Hello! How can I help you";
+
+        welcomeMessage.dir = 'rtl';
+
+        display.appendChild(welcomeMessage);
+
+      }, 500);
+
+    });
+
+  </script>
+
+</body>
+
+</html>
+
+ 
